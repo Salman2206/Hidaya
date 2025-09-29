@@ -1,0 +1,84 @@
+/* General */
+body {
+  font-family: Arial, sans-serif;
+  background: #f5ccf5;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+/* Header */
+.header {
+  margin: 10px 0;
+}
+.bismillah {
+  width: 80%;
+  max-width: 350px;
+}
+
+/* Zikr Card */
+.zikr-card {
+  background: white;
+  margin: 15px auto;
+  padding: 12px;
+  width: 85%;
+  border-radius: 12px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+.zikr-card .arabic {
+  font-size: 20px;
+  font-weight: bold;
+}
+.zikr-card .translation {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Prayer Times */
+.prayer-box {
+  background: white;
+  width: 90%;
+  margin: 15px auto;
+  border-radius: 10px;
+  padding: 10px;
+}
+.prayer-box h2 {
+  margin: 0;
+  font-weight: bold;
+}
+.prayer-times {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+.prayer-times .label {
+  font-size: 14px;
+  font-weight: bold;
+}
+.prayer-times .time {
+  font-size: 16px;
+  margin-top: 3px;
+}
+
+/* Menu Grid */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+.menu-item {
+  background: white;
+  border-radius: 15px;
+  padding: 12px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+.menu-item img {
+  width: 50px;
+  height: 50px;
+}
+.menu-item p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  font-weight: bold;
+}

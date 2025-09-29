@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qur'an - Surah 90</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f0fa;
+      margin: 0;
+      padding: 0;
+      line-height: 1.8;
+    }
+
+    /* Fixed top bar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100vw;
+      background: linear-gradient(90deg, #6a0dad, #9a4ef1);
+      color: #fff;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      border-bottom: 2px solid #ece3ff;
+      box-sizing: border-box;
+    }
+
+    /* Font controls inside topbar */
+    .font-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .font-controls button {
+      width: 32px;
+      height: 32px;
+      border-radius: 20%;
+      border: none;
+      background: #fff;
+      color: #6a0dad;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .font-controls button:hover {
+      background: #ece3ff;
+    }
+
+    #quran {
+      width: 100%;
+      max-width: 900px;
+      margin: 80px auto 20px auto;
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+
+    /* Surah title */
+    .surah-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #6a0dad;
+      text-align: center;
+      margin: 40px 0 20px;
+      padding: 10px;
+      background: #f8f4ff;
+      border-radius: 8px;
+    }
+
+    /* Ayah block */
+    .ayah {
+      position: relative;
+      margin-bottom: 16px;
+      padding: 40px 15px 15px 15px;
+      border-radius: 10px;
+      background: #fafafa;
+      transition: background 0.3s ease;
+    }
+
+    .ayah:hover {
+      background: #f1ebff;
+    }
+
+    /* Ayah header */
+    .ayah-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: absolute;
+      top: 5px;
+      left: 15px;
+    }
+
+    .ayah-num {
+      font-size: 17px;
+      color: #6a0dad;
+      font-weight: bold;
+    }
+
+    /* Bookmark */
+    .bookmark {
+      position: absolute;
+      top: 5px;
+      left: 35px;
+      cursor: pointer;
+    }
+
+    .bookmark img {
+      width: 22px;
+      height: auto;
+      transition: filter 0.3s ease;
+    }
+
+    .bookmark.active img {
+      filter: hue-rotate(100deg) brightness(1.6);
+    }
+
+    /* Arabic text */
+    .ayah-ar {
+      font-family: "Amiri Quran", serif;
+      font-size: 32px;
+      line-height: 2;
+      text-align: right;
+      direction: rtl;
+      color: #000;
+    }
+
+    .highlighted {
+      background: #fff8d9 !important;
+    }
+
+    /* Nav buttons */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+
+    .nav-buttons.bottom {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #ece3ff;
+    }
+
+    .nav-buttons .btn {
+      background: linear-gradient(90deg, #6a0dad, #9a4ef1);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .nav-buttons .btn:hover {
+      opacity: 0.85;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      .ayah-ar {
+        font-size: 24px;
+      }
+
+      .ayah {
+        padding: 38px 12px 12px 12px;
+      }
+
+      #quran {
+        margin: 100px 0 0 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div>📖 Qur'an - Surah 90</div>
+    <div class="font-controls">
+      <span>Text Size:</span>
+      <button onclick="changeFontSize(-2)">-</button>
+      <button onclick="changeFontSize(2)">+</button>
+    </div>
+  </header>
+
+  <div id="quran">Loading...</div>
+
+  <!-- Load JSON -->
+  <script src="./surah90.js"></script>
+
+  <script>
+    let currentFontSize = 32;
+
+    function changeFontSize(delta) {
+      currentFontSize += delta;
+      if (currentFontSize < 16) currentFontSize = 16;
+      if (currentFontSize > 72) currentFontSize = 72;
+      document.querySelectorAll(".ayah-ar").forEach(el => {
+        el.style.fontSize = currentFontSize + "px";
+      });
+    }
+
+    async function loadJuz() {
+      try {
+        const ayahs = surah90;
+        let html = "";
+        let currentSurah = null;
+
+        const savedBookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+
+        ayahs.forEach((a, index) => {
+          if (a.surah.number !== currentSurah) {
+            currentSurah = a.surah.number;
+
+            html += `
+              <div class="surah-title">
+                📖 ${a.surah.name} (${a.surah.englishName}) 
+                <br><small>${a.surah.englishNameTranslation}</small>
+              </div>
+            `;
+
+            if (a.surah.number !== 9) {
+              html += `
+                <div class="ayah">
+                  <div class="ayah-ar">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+                </div>
+              `;
+            }
+
+            // Top Nav Buttons
+            html += `<div class="nav-buttons">`;
+            if (a.surah.number > 1) {
+              html += `<a href="surah${a.surah.number - 1}.html" class="btn prev">⬅ Previous Surah</a>`;
+            } else {
+              html += `<span></span>`;
+            }
+            if (a.surah.number < 114) {
+              html += `<a href="surah${a.surah.number + 1}.html" class="btn next">Next Surah ➡</a>`;
+            }
+            html += `</div>`;
+          }
+
+          const ayahId = `${a.surah.number}:${a.numberInSurah}`;
+          const isBookmarked = savedBookmarks.includes(ayahId);
+
+          html += `
+            <div class="ayah" id="ayah-${ayahId}" data-ayah="${ayahId}">
+              <div class="ayah-header">
+                <div class="ayah-num">${a.numberInSurah}</div>
+                <span class="bookmark ${isBookmarked ? "active" : ""}">
+                  <img src="bookm.png" alt="Bookmark" />
+                </span>
+              </div>
+              <div class="ayah-ar">${a.text}</div>
+            </div>
+          `;
+        });
+
+        // Bottom Nav Buttons
+        html += `<div class="nav-buttons bottom">`;
+        if (currentSurah > 1) {
+          html += `<a href="surah${currentSurah - 1}.html" class="btn prev">⬅ Previous Surah</a>`;
+        } else {
+          html += `<span></span>`;
+        }
+        if (currentSurah < 114) {
+          html += `<a href="surah${currentSurah + 1}.html" class="btn next">Next Surah ➡</a>`;
+        }
+        html += `</div>`;
+
+        document.getElementById("quran").innerHTML = html;
+
+        // Bookmark clicks
+        document.querySelectorAll(".ayah").forEach(el => {
+          el.addEventListener("click", (e) => {
+            if (e.target.closest(".bookmark")) {
+              const ayahId = el.dataset.ayah;
+              toggleBookmark(ayahId, el.querySelector(".bookmark"));
+              e.stopPropagation();
+            } else {
+              document.querySelectorAll(".ayah").forEach(a => a.classList.remove("highlighted"));
+              el.classList.add("highlighted");
+            }
+          });
+        });
+      } catch (err) {
+        document.getElementById("quran").innerText = "Error loading Qur'an.";
+        console.error(err);
+      }
+    }
+
+    function toggleBookmark(ayahId, iconEl) {
+      let bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+
+      if (bookmarks.includes(ayahId)) {
+        bookmarks = bookmarks.filter(id => id !== ayahId);
+        iconEl.classList.remove("active");
+      } else {
+        bookmarks.push(ayahId);
+        iconEl.classList.add("active");
+      }
+
+      localStorage.setItem("bookmarks", JSON.stringify(bookmarks));
+    }
+
+    loadJuz();
+  </script>
+</body>
+
+</html>

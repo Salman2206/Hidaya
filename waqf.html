@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qur'an - Waqf Signs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" rel="stylesheet">
+  <style>
+    /* GENERAL STYLES */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f0fa;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      overflow-x: hidden; /* prevents horizontal scroll */
+    }
+
+    /* FIXED TOP BAR */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%; /* 100% instead of 100vw */
+      background: linear-gradient(90deg, #6a0dad, #9a4ef1);
+      color: #fff;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      border-bottom: 2px solid #ece3ff;
+      box-sizing: border-box;
+    }
+
+    /* CONTAINER */
+    #container {
+      width: 95%;
+      max-width: 1000px;
+      margin: 100px auto 50px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #6a0dad;
+      margin-bottom: 20px;
+    }
+
+    /* TABLE STYLES */
+    .table-wrapper {
+      overflow-x: auto; /* allows scroll on really small screens */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+      table-layout: fixed; /* fixes column widths */
+    }
+
+    th,
+    td {
+      border: 1px solid #dcd6f7;
+      padding: 12px 10px;
+      text-align: center;
+      word-wrap: break-word; /* wraps long text */
+    }
+
+    th {
+      background: linear-gradient(90deg, #6a0dad, #9a4ef1);
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background: #f8f4ff;
+    }
+
+    tr:hover {
+      background: #e6d9ff;
+    }
+
+    .arabic {
+      font-family: 'Amiri Quran', serif;
+      font-size: 20px;
+      direction: rtl;
+      text-align: right;
+    }
+
+    .sign {
+      font-size: 30px;
+    }
+
+    /* RESPONSIVE STYLES */
+    @media (max-width: 768px) {
+      table,
+      th,
+      td {
+        font-size: 14px;
+      }
+
+      .sign {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .arabic {
+        font-size: 18px;
+      }
+
+      .sign {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">📖 Qur'an - Waqf Signs</header>
+
+  <div id="container">
+    <h1>Waqf Signs in Qur'an</h1>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Name / Sign</th>
+            <th>What It Is</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="sign">م </span> - Waqf e Lazim</td>
+            <td>A mandatory stop, where you must pause.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">ط </span>- Waqf e Mutlaq</td>
+            <td>A complete, unrestricted pause.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">ج </span>- Waqf e Jaiz</td>
+            <td>A permissible pause, but not mandatory.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">مـ </span>- Waqf e Mujawwaz</td>
+            <td>A pause that’s more extended than permissible.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">ص </span>– Waqf e Murakh-Khas</td>
+            <td>A specific pause for emphasis.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">صلي </span>- Al-Wasl Awlaa</td>
+            <td>Stopping at “صلي” but preferable to continue.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">ق </span> - Qeela ‘Alayhil-Waqf</td>
+            <td>Pause after “ق” but not mandatory.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">صل </span>- Qad Yusal</td>
+            <td>Stopping at “صل” with a pause.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">قف </span>- Qif</td>
+            <td>A full stop where you must pause.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">س </span>– Saktah</td>
+            <td>A light pause, similar to “ج”.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">وقفته </span>- Waqfah</td>
+            <td>Pausing at the end of a verse.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">لا </span>- Laa</td>
+            <td>A pause without a pause.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">ك </span>- Kadhaalik</td>
+            <td>Another way to pause without a pause.</td>
+          </tr>
+          <tr>
+            <td><span class="sign">ﹸ </span>- Mu’anaqah</td>
+            <td>A momentary pause or hesitation.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+
+</html>

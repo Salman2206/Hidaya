@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Islamic App - Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5ccf5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    
+     .box {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 10px;
+      margin: 5px auto;
+      min-width: 280px;
+      display: inline-block;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #6a0dad;
+      margin-bottom: 10px;
+    }
+    .table {
+      display: flex;
+      justify-content: space-around;
+    }
+    .col {
+      font-size: 18px;
+      color: #333;
+    }
+    .col strong {
+      display: block;
+      margin-bottom: 5px;
+      color: #6a0dad;
+    }
+    #nextLine {
+      font-size: 20px;
+      font-weight: bold;
+      color: red;
+      margin-top: 3px;
+    }
+
+    /* Bismillah */
+    .bismillah {
+      margin-top: 15px;
+    
+    }
+    .bismillah img {
+      max-width: 55%;
+      height: auto;
+    }
+
+    /* Zikr Slider */
+    .zikr-slider {
+      margin: 15px auto;
+      position: relative;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    .zikr-container {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    .zikr-card {
+      min-width: 100%;
+      background: white;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .zikr-arabic {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .zikr-translit {
+      font-size: 20px;
+      color: #444;
+      margin-bottom: 10px;
+    }
+    .zikr-english {
+      font-size: 18px;
+      color: #666;
+    }
+
+    /* Dots */
+    .dots {
+      display: flex;
+      justify-content: center;
+      margin-top: 0px;
+      gap: 6px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e978e9;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .dot.active {
+      background: #fff;
+    }
+
+    /* Prayer Times */
+    .prayer-times {
+      margin: 20px;
+      text-align: center;
+    }
+    .prayer-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .prayer-table {
+      display: flex;
+      justify-content: center;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 auto;
+      width: 90%;
+      max-width: 400px;
+    }
+    .prayer-col {
+      flex: 1;
+      padding: 10px;
+      font-size: 20px;
+    }
+    
+.prayer-col:not(:last-child) {
+  position: relative; /* needed for absolute positioning */
+}
+
+.prayer-col:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 25%;           /* pushes it down */
+  height: 50%;        /* only half the height */
+  border-right: 1px solid #ccc;
+}
+      
+      
+    
+    .prayer-col strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+  a:link {
+  text-decoration: none;
+}
+
+    /* Icon Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      padding: 20px;
+    }
+    .grid-item {
+      background: white;
+      border-radius: 15px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .grid-item img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 3px;
+    }
+    .grid-item span {
+      display: block;
+      font-size: 14px;
+      color: black;
+    }
+    
+    .topper {font-weight: bold;
+      font-size: 26px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Bismillah -->
+  <div class="bismillah">
+    <div class="topper">Hidaya - All in One Quran App</div>
+  </div>
+
+  <!-- Zikr Slider -->
+  <div class="zikr-slider" id="zikrSlider">
+    <div class="zikr-container" id="zikrContainer">
+      <div class="zikr-card">
+        <div class="zikr-arabic">سُبْحَانَ الله</div>
+        <div class="zikr-translit">SubḥānAllāh</div>
+        <div class="zikr-english">Glory be to Allah</div>
+      </div>
+      <div class="zikr-card">
+        <div class="zikr-arabic">الْحَمْدُ لِلَّهِ</div>
+        <div class="zikr-translit">Alḥamdulillāh</div>
+        <div class="zikr-english">All praise is due to Allah</div>
+      </div>
+      <div class="zikr-card">
+        <div class="zikr-arabic">اللّه أكبر</div>
+        <div class="zikr-translit">Allāhu Akbar</div>
+        <div class="zikr-english">Allah is the Greatest</div>
+      </div>
+      <div class="zikr-card">
+        <div class="zikr-arabic">لا إله إلا الله</div>
+        <div class="zikr-translit">Lā ilāha illallāh</div>
+        <div class="zikr-english">There is no god but Allah</div>
+      </div>
+      <div class="zikr-card">
+        <div class="zikr-arabic">أستغفر الله</div>
+        <div class="zikr-translit">Astaghfirullāh</div>
+        <div class="zikr-english">I seek forgiveness from Allah</div>
+      </div>
+    </div>
+  </div>
+      <div class="dots" id="dots"></div>
+
+  <!-- Prayer Times -->
+  <div class="prayer-times">
+    <div class="prayer-title" id="prayerName">Loading...</div>
+    <div class="prayer-table">
+      <div class="prayer-col">
+        <strong>Start</strong>
+        <span id="startTime">--</span>
+      </div>
+      <div class="prayer-col">
+        <strong>End</strong>
+        <span id="endTime">--</span>
+      </div>
+    </div>
+        <div id="nextLine">--</div>
+  </div>
+  </div>
+ 
+  
+
+
+
+  <!-- Menu Grid -->
+  <div class="grid">
+   <a href="quran.html"> <div class="grid-item"><img src="qu.png"><span>Quran</span></div> </a>
+   <a href="namaz.html"> <div class="grid-item"><img src="namaz.png"><span>Namaz</span></div> </a>
+    <a href="qaza.html"><div class="grid-item"><img src="qaza.png"><span>Qaza Tracker</span></div></a>
+   <a href="waqf.html"> <div class="grid-item"><img src="waqf.png"><span>Waqf</span></div></a>
+   <a href="counter.html"> <div class="grid-item"><img src="counter.png"><span>Counter</span></div></a>
+   <a href="dua.html"> <div class="grid-item"><img src="dua.jpg"><span>All Dua</span></div> </a>
+   <!-- <div class="grid-item"><img src="https://cdn-icons-png.flaticon.com/512/1047/1047712.png"><span>Kitab</span></div>
+    <div class="grid-item"><img src="dua.jpg"><span>All Dua</span></div>
+    <div class="grid-item"><img src="dua.jpg"><span>Share</span></div>
+  </div> -->
+
+  <script>
+    
+    const city = "Mumbai";
+    const country = "India";
+    const apiBase = "https://api.aladhan.com/v1/timingsByCity";
+
+    let prayerOrder = [];
+    let nextPrayer = null;
+
+    function to12HourFormat(time) {
+      let [h, m] = time.split(":").map(Number);
+      let suffix = h >= 12 ? "PM" : "AM";
+      h = (h % 12) || 12;
+      return `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
+    }
+
+    function toMinutes(time) {
+      const [h, m] = time.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function getCurrentPrayer(prayers) {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      for (let i = 0; i < prayers.length; i++) {
+        const [, start, end] = prayers[i];
+        const startMins = toMinutes(start);
+        const endMins = toMinutes(end);
+
+        if (endMins < startMins) {
+          if (currentMinutes >= startMins || currentMinutes <= endMins) return prayers[i];
+        } else if (currentMinutes >= startMins && currentMinutes < endMins) {
+          return prayers[i];
+        }
+      }
+      return prayers[0];
+    }
+
+    function getNextPrayer(prayers, currentPrayer) {
+      let idx = prayers.findIndex(p => p[0] === currentPrayer[0]);
+      return prayers[(idx + 1) % prayers.length];
+    }
+
+    async function loadPrayerTimes() {
+      try {
+        const res = await fetch(`${apiBase}?city=${city}&country=${country}&method=99&school=1`);
+        const data = await res.json();
+        const t = data.data.timings;
+
+        prayerOrder = [
+          ["Fajr", t.Fajr, t.Sunrise],
+          ["Sunrise", t.Sunrise, t.Dhuhr],
+          ["Dhuhr", t.Dhuhr, t.Asr],
+          ["Asr", t.Asr, t.Maghrib],
+          ["Maghrib", t.Maghrib, t.Isha],
+          ["Isha", t.Isha, t.Fajr]
+        ];
+
+        const currentPrayer = getCurrentPrayer(prayerOrder);
+        nextPrayer = getNextPrayer(prayerOrder, currentPrayer);
+
+        document.getElementById("prayerName").innerText = currentPrayer[0];
+        document.getElementById("startTime").innerText = to12HourFormat(currentPrayer[1]);
+        document.getElementById("endTime").innerText = to12HourFormat(currentPrayer[2]);
+
+      } catch (err) {
+        console.error("Error fetching prayer times:", err);
+        document.getElementById("prayerName").innerText = "Error";
+      }
+    }
+
+    function updateNextLine() {
+      if (!nextPrayer) return;
+      const now = new Date();
+
+      let [h, m] = nextPrayer[1].split(":").map(Number);
+      let target = new Date();
+      target.setHours(h, m, 0, 0);
+
+      if (target <= now) {
+        target.setDate(target.getDate() + 1);
+      }
+
+      let diff = Math.floor((target - now) / 1000);
+      let hrs = Math.floor(diff / 3600);
+      let mins = Math.floor((diff % 3600) / 60);
+      let secs = diff % 60;
+
+      document.getElementById("nextLine").innerText =
+        `Next: ${nextPrayer[0]} - ${hrs}h ${mins}m ${secs}s`;
+    }
+
+    loadPrayerTimes();
+    setInterval(loadPrayerTimes, 60000); // refresh API every min
+    setInterval(updateNextLine, 1000);   // live countdown with seconds
+    
+    const container = document.getElementById("zikrContainer");
+    const slides = document.querySelectorAll(".zikr-card");
+    const dotsContainer = document.getElementById("dots");
+    let index = 0;
+    let autoSlide = setInterval(nextSlide, 2000);
+
+    // create dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement("div");
+      dot.classList.add("dot");
+      if (i === 0) dot.classList.add("active");
+      dot.addEventListener("click", () => {
+        showSlide(i);
+        resetAuto();
+      });
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll(".dot");
+
+    function showSlide(i) {
+      index = (i + slides.length) % slides.length;
+      container.style.transform = `translateX(-${index * 100}%)`;
+      dots.forEach(dot => dot.classList.remove("active"));
+      dots[index].classList.add("active");
+    }
+
+    function nextSlide() {
+      showSlide(index + 1);
+    }
+
+    function resetAuto() {
+      clearInterval(autoSlide);
+      autoSlide = setInterval(nextSlide, 4000);
+    }
+
+    // Swipe for mobile
+    let startX = 0;
+    const slider = document.getElementById("zikrSlider");
+
+    slider.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+    });
+
+    slider.addEventListener("touchend", e => {
+      let endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50) { nextSlide(); resetAuto(); } // swipe left
+      if (endX - startX > 50) { showSlide(index - 1); resetAuto(); } // swipe right
+    });
+  </script>
+
+</body>
+</html>

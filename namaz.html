@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prayer Times (Hanafi)</title>
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      background: #faf6ff;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    h1 {
+      color: #6a0dad;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 2px solid #d0a9f5;
+      font-size: 16px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    .info {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .next-prayer {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 15px 0;
+      padding: 10px;
+      border-radius: 12px;
+      background: #efe4ff;
+      color: #4a148c;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .prayer-card {
+      background: #f9f0ff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+
+    .prayer-card.active {
+      background: #e6d4fa;
+      border: 2px solid #6a0dad;
+    }
+
+    .prayer-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4a148c;
+      flex: 1;
+      text-align: left;
+    }
+
+    .prayer-times {
+      flex: 2;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+
+    .time-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .time-label {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 2px;
+    }
+
+    .time-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #000;
+    }
+
+    .alarm {
+      font-size: 20px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Prayer Times (Hanafi)</h1>
+
+  <select id="citySelect">
+    <option value="Mumbai">Mumbai</option>
+    <option value="Delhi">Delhi</option>
+    <option value="Hyderabad">Hyderabad</option>
+    <option value="Bangalore">Bangalore</option>
+    <option value="Chennai">Chennai</option>
+  </select>
+
+  <div class="info" id="cityInfo"></div>
+  <div class="info" id="dateInfo"></div>
+
+  <div class="next-prayer" id="nextPrayer">Next Prayer: --</div>
+
+  <div id="prayerList"></div>
+
+  <script>
+    const apiBase = "https://api.aladhan.com/v1/timingsByCity";
+    const citySelect = document.getElementById("citySelect");
+    const cityInfo = document.getElementById("cityInfo");
+    const dateInfo = document.getElementById("dateInfo");
+    const nextPrayerBox = document.getElementById("nextPrayer");
+    const prayerList = document.getElementById("prayerList");
+    let prayerOrder = [];
+    let lastNextPrayer = "";
+
+    // Convert to 12-hour format
+    function to12HourFormat(time) {
+      let [h, m] = time.split(":").map(Number);
+      let suffix = h >= 12 ? "PM" : "AM";
+      h = (h % 12) || 12;
+      return `${h}:${m.toString().padStart(2, "0")} ${suffix}`;
+    }
+
+    function toMinutes(time) {
+      const [h, m] = time.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function getCurrentPrayer() {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      for (let i = 0; i < prayerOrder.length; i++) {
+        const [, start, end] = prayerOrder[i];
+        const startMins = toMinutes(start);
+        const endMins = toMinutes(end);
+
+        if (endMins < startMins) {
+          if (currentMinutes >= startMins || currentMinutes <= endMins) {
+            return i;
+          }
+        } else if (currentMinutes >= startMins && currentMinutes < endMins) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    function getNextPrayer() {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      for (let i = 0; i < prayerOrder.length; i++) {
+        const [name, start] = prayerOrder[i];
+        const startMins = toMinutes(start);
+        if (startMins > currentMinutes) {
+          return [name, startMins - currentMinutes];
+        }
+      }
+      const [name, start] = prayerOrder[0]; // wrap to Fajr next day
+      return [name, 24 * 60 - currentMinutes + toMinutes(start)];
+    }
+
+    function formatCountdown(minsLeft) {
+      const h = Math.floor(minsLeft / 60);
+      const m = Math.floor(minsLeft % 60);
+      const s = new Date().getSeconds();
+      const sec = 59 - s;
+      return `${h > 0 ? h + "h " : ""}${m}m ${sec}s`;
+    }
+
+    function renderPrayerTimes() {
+      const currentPrayerIndex = getCurrentPrayer();
+      const [nextName, minsLeft] = getNextPrayer();
+
+      // Vibrate when prayer time starts
+      if (lastNextPrayer && lastNextPrayer !== nextName) {
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      }
+      lastNextPrayer = nextName;
+
+      nextPrayerBox.innerText = `Next Prayer: ${nextName} in ${formatCountdown(minsLeft)}`;
+
+      prayerList.innerHTML = "";
+      prayerOrder.forEach(([name, start, end], idx) => {
+        const card = document.createElement("div");
+        card.className = "prayer-card";
+        if (idx === currentPrayerIndex) card.classList.add("active");
+
+        card.innerHTML = `
+          <div class="prayer-name">${name}</div>
+          <div class="prayer-times">
+            <div class="time-box">
+              <div class="time-label">Start</div>
+              <div class="time-value">${to12HourFormat(start)}</div>
+            </div>
+            <div class="time-box">
+              <div class="time-label">End</div>
+              <div class="time-value">${to12HourFormat(end)}</div>
+            </div>
+          </div>
+          <span class="alarm">⏰</span>
+        `;
+        prayerList.appendChild(card);
+      });
+    }
+
+    async function loadPrayerTimes(city) {
+      const res = await fetch(`${apiBase}?city=${city}&country=India&method=3&school=1`);
+      const data = await res.json();
+      const timings = data.data.timings;
+      const date = data.data.date.readable;
+      const hijri = data.data.date.hijri.date;
+
+      cityInfo.innerText = `City: ${city} (India)`;
+      dateInfo.innerText = `Date: ${date} | Hijri: ${hijri}`;
+
+      // Dhuhr ends at Hanafi Asr
+      prayerOrder = [
+        ["Fajr", timings.Fajr, timings.Sunrise],
+        ["Sunrise", timings.Sunrise, timings.Dhuhr],
+        ["Dhuhr", timings.Dhuhr, timings.Asr],
+        ["Asr", timings.Asr, timings.Maghrib],
+        ["Maghrib", timings.Maghrib, timings.Isha],
+        ["Isha", timings.Isha, timings.Fajr]
+      ];
+
+      renderPrayerTimes();
+    }
+
+    citySelect.addEventListener("change", () => {
+      loadPrayerTimes(citySelect.value);
+    });
+
+    // Auto-refresh countdown every second
+    setInterval(renderPrayerTimes, 1000);
+
+    // Load default city
+    loadPrayerTimes(citySelect.value);
+  </script>
+</body>
+</html>

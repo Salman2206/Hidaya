@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Qibla – Simple Arrow (with Fallback)</title>
+<style>
+  :root{
+    --lav1:#f8e1f4; --lav2:#e7d6f9;
+    --accent:#9c5df0; --accent2:#6f3bd8;
+    --card:#ffffff; --text:#3a206e; --muted:#6c6c6c; --ok:#2e7d32;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:linear-gradient(180deg,var(--lav1),var(--lav2)); color:var(--text);
+    min-height:100svh; display:flex; flex-direction:column;
+  }
+  .header{
+    position:sticky; top:0; z-index:10;
+    background:linear-gradient(180deg,var(--lav1),var(--lav2));
+    padding:14px 16px 10px; text-align:center;
+    font-weight:800; font-size:20px; letter-spacing:.2px; color:#4a2a88;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    border-bottom-left-radius:14px; border-bottom-right-radius:14px;
+  }
+  .wrap{ width:100%; max-width:520px; margin:16px auto; padding:12px; display:flex; flex-direction:column; gap:16px; align-items:center; }
+  .card{ width:100%; background:var(--card); border-radius:20px; padding:18px; box-shadow:0 10px 24px rgba(0,0,0,.10); }
+
+  .dial-wrap{ display:grid; place-items:center; }
+  .dial{
+    width:280px; height:280px; border-radius:50%;
+    background:radial-gradient(circle at 50% 40%, #ffffff 0%, #fbf8ff 55%, #f1e7fb 100%);
+    border:10px solid var(--accent);
+    box-shadow:inset 0 0 0 6px #efe3ff, 0 8px 30px rgba(0,0,0,.12);
+    position:relative;
+  }
+  .tick-top{
+    position:absolute; top:6px; left:50%; transform:translateX(-50%);
+    width:4px; height:22px; border-radius:3px; background:var(--accent2); opacity:.65;
+  }
+
+  /* Qibla arrow */
+  .qibla{
+    position:absolute; left:50%; top:50%;
+    transform:translate(-50%,-50%) rotate(0deg);
+    transform-origin:50% 85%;
+    transition:transform .15s ease-out;
+  }
+  .qibla svg{ width:120px; height:160px; display:block; }
+  .arrow-body{ fill:#2e7d32; }
+  .arrow-stroke{ fill:#1b5e20; opacity:.18; }
+
+  .row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:8px; }
+  .btn{
+    padding:10px 14px; border:none; border-radius:999px; cursor:pointer;
+    font-weight:800; color:#fff; background:var(--accent);
+    box-shadow:0 6px 18px rgba(124,78,219,.35); transition:transform .1s ease, background .2s ease;
+  }
+  .btn:active{ transform:scale(.97) }
+  .btn.secondary{ background:#ece3ff; color:#4a2a88; box-shadow:none; }
+  .chip-bar{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:6px; }
+  .chip{
+    background:#ffffff; border:1px solid #eadbff; color:#4a2a88;
+    padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700;
+  }
+  .big{ font-size:18px; font-weight:800; color:#4a2a88; text-align:center; margin-top:4px; }
+  .status{ text-align:center; color:var(--muted); font-size:14px; line-height:1.45; margin-top:6px; }
+  .ok{ color:var(--ok); }
+  .warn{ color:#b23a30; }
+
+  .note{ text-align:center; font-size:12px; color:#7b6d9f; opacity:.9; padding:4px 6px 10px; }
+</style>
+</head>
+<body>
+  <div class="header">🕋 Qibla Direction</div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="dial-wrap">
+        <div class="dial" id="dial">
+          <div class="tick-top" aria-hidden="true"></div>
+          <div class="qibla" id="qArrow" aria-label="Qibla arrow">
+            <svg viewBox="0 0 120 160" role="img" aria-hidden="true">
+              <path class="arrow-stroke" d="M60 6 L92 78 Q60 70 28 78 Z"/>
+              <path class="arrow-body" d="M60 8 L94 82 L60 72 L26 82 Z"/>
+              <rect class="arrow-body" x="54" y="72" width="12" height="60" rx="6"/>
+              <circle cx="60" cy="136" r="8" fill="#1b5e20" opacity=".25"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn" id="locBtn">Enable Location</button>
+        <button class="btn" id="compassBtn">Enable Compass</button>
+        <button class="btn secondary" id="tipsBtn">Calibration Tips</button>
+      </div>
+
+      <div class="big" id="angleTxt">Qibla angle: --°</div>
+      <div class="status" id="statusTxt">Tap “Enable Location”, then “Enable Compass”.</div>
+
+      <div class="chip-bar" id="chips" style="display:none;">
+        <span class="chip" id="cityChip">City: --</span>
+        <span class="chip" id="bearingChip">Bearing: --°</span>
+        <span class="chip" id="modeChip">Mode: --</span>
+        <span class="chip" id="offsetChip">Offset: --°</span>
+      </div>
+    </div>
+
+    <div class="note">
+      Keep the arrow pointing <b>up</b> (12 o’clock). You’ll feel a tiny vibration when aligned.
+    </div>
+  </div>
+
+<script>
+/* ===== Config ===== */
+const KAABA = { lat: 21.4225, lon: 39.8262 };
+const vibOk = 'vibrate' in navigator;
+
+/* ===== State ===== */
+let user = { lat:null, lon:null, city:'--' };
+let qibla = null;             // absolute bearing to Kaaba (0°=North)
+let heading = null;           // device heading (0°=North)
+let compassActive = false;    // whether compass events are coming
+let fallbackTimer = null;
+
+/* ===== Elements ===== */
+const qArrow = document.getElementById('qArrow');
+const angleTxt = document.getElementById('angleTxt');
+const statusTxt = document.getElementById('statusTxt');
+const chips = document.getElementById('chips');
+const cityChip = document.getElementById('cityChip');
+const bearingChip = document.getElementById('bearingChip');
+const modeChip = document.getElementById('modeChip');
+const offsetChip = document.getElementById('offsetChip');
+
+document.getElementById('locBtn').addEventListener('click', getLocation);
+document.getElementById('compassBtn').addEventListener('click', enableCompass);
+document.getElementById('tipsBtn').addEventListener('click', showTips);
+
+/* ===== Utils ===== */
+const toRad = d => d * Math.PI / 180;
+const toDeg = r => r * 180 / Math.PI;
+function calcBearing(lat1, lon1, lat2, lon2){
+  const φ1 = toRad(lat1), φ2 = toRad(lat2), Δλ = toRad(lon2-lon1);
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}
+function fmt1(x){ return (Math.round(x*10)/10).toFixed(1); }
+function toCardinal(deg){
+  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return dirs[Math.round(deg/22.5) % 16];
+}
+
+/* ===== Core UI Update ===== */
+function updateUI(){
+  if(qibla == null) return;
+  // If we have a heading, rotate arrow so that it points UP when facing Qibla
+  if(compassActive && heading != null){
+    const relative = (qibla - heading + 360) % 360;
+    qArrow.style.transform = `translate(-50%,-50%) rotate(${relative}deg)`;
+    const delta = Math.min(relative, 360 - relative);
+    offsetChip.textContent = `Offset: ${fmt1(delta)}°`;
+    modeChip.textContent = 'Mode: Live';
+    statusTxt.innerHTML = (delta <= 5)
+      ? `<span class="ok">Aligned with Qibla ✓</span>`
+      : `Turn until the arrow points <b>up</b>.`;
+    if(delta <= 5 && vibOk){
+      const now = Date.now();
+      if(!updateUI._t || now - updateUI._t > 1500){ navigator.vibrate(15); updateUI._t = now; }
+    }
+  } else {
+    // Fallback: no heading → show absolute bearing from North
+    // Arrow fixed relative to North: rotate by qibla itself
+    qArrow.style.transform = `translate(-50%,-50%) rotate(${qibla}deg)`;
+    offsetChip.textContent = `Offset: --°`;
+    modeChip.textContent = 'Mode: Fallback';
+    const card = toCardinal(qibla);
+    statusTxt.innerHTML = `No compass. Face so the arrow points <b>up</b>.<br/>Qibla is <b>${fmt1(qibla)}°</b> from North (${card}).`;
+  }
+  angleTxt.textContent = `Qibla angle: ${fmt1(qibla)}°`;
+  bearingChip.textContent = `Bearing: ${fmt1(qibla)}°`;
+  chips.style.display = 'flex';
+}
+
+/* ===== Location ===== */
+function getLocation(){
+  if(!navigator.geolocation){ statusTxt.textContent = 'Geolocation not supported.'; return; }
+  statusTxt.textContent = 'Getting location…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    user.lat = pos.coords.latitude;
+    user.lon = pos.coords.longitude;
+    qibla = calcBearing(user.lat, user.lon, KAABA.lat, KAABA.lon);
+    cityChip.textContent = 'City: detected';
+    statusTxt.textContent = 'Location OK. You can enable compass (optional).';
+    updateUI();
+  }, err=>{
+    statusTxt.textContent = 'Location denied/unavailable.';
+  }, { enableHighAccuracy:true, timeout:12000, maximumAge:60000 });
+}
+
+/* ===== Compass ===== */
+async function enableCompass(){
+  statusTxt.textContent = 'Enabling compass…';
+  // iOS permission gate
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try{
+      const res = await DeviceOrientationEvent.requestPermission();
+      if(res !== 'granted'){ statusTxt.textContent = 'Compass permission not granted.'; startFallbackTimer(); return; }
+    }catch(e){ statusTxt.textContent = 'Compass permission failed.'; startFallbackTimer(); return; }
+  }
+
+  let gotEvent = false;
+  const handler = (ev)=>{
+    let h = null;
+    if (typeof ev.webkitCompassHeading === 'number') {
+      h = ev.webkitCompassHeading; // iOS: 0 = North, clockwise
+    } else if (typeof ev.alpha === 'number') {
+      // Most Androids: invert alpha to get compass-like heading
+      h = 360 - ev.alpha;
+    }
+    if (h != null) {
+      heading = (h + 360) % 360;
+      gotEvent = true;
+      compassActive = true;
+      updateUI();
+    }
+  };
+
+  window.addEventListener('deviceorientationabsolute', handler, true);
+  window.addEventListener('deviceorientation', handler, true);
+
+  // If nothing arrives in 2s, assume no sensor → fallback mode
+  startFallbackTimer(()=>{ if(!gotEvent){ compassActive = false; updateUI(); } });
+}
+
+function startFallbackTimer(after){
+  clearTimeout(fallbackTimer);
+  fallbackTimer = setTimeout(()=>{
+    if (typeof after === 'function') after();
+    if(!compassActive){
+      statusTxt.innerHTML = 'Compass not available. Using fallback mode.';
+      updateUI();
+    }
+  }, 2000);
+}
+
+/* ===== Tips ===== */
+function showTips(){
+  alert(
+`Calibration tips:
+• Move phone in a figure-8 a few times
+• Remove magnetic cases/nearby magnets
+• Turn off battery saver / power saving
+• Ensure Location & Motion permissions are allowed
+• On Android Chrome, use HTTPS for best results`
+  );
+}
+
+/* ===== On load ===== */
+statusTxt.textContent = 'Tap “Enable Location”, then “Enable Compass” (optional).';
+</script>
+</body>
+</html>

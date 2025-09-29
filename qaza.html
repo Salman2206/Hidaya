@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qaza Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #eac8f9, #d6a8f1);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #7d4bc7;
+      font-size: 1.6rem;
+    
+    }
+
+    .prayer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 12px 0;
+      background: #fff;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .prayer span {
+      font-size: 1.2rem;
+      color: #7a35d0;
+      width: 70px;
+      text-align: left;
+    }
+
+    .count {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: black;
+      width: 60px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    /* Animation */
+    @keyframes pop {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .count.pop {
+      animation: pop 0.3s ease;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 5px;
+    }
+
+    .buttons button {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px;
+      border-radius: 8px;
+      background: white;
+      color: #7d4bc7;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.3s;
+    }
+
+    .buttons button:hover {
+      background: #f0e7ff;
+      transform: scale(1.05);
+    }
+
+    .total {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: black;
+    }
+
+    .reset {
+      margin-top: 15px;
+      background: #ff4d6d;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .reset:hover {
+      background: #e63956;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Qaza Tracker</h2>
+
+    <div class="prayer" data-prayer="Fajr">
+      <span>Fajr</span>
+      <div class="count" id="Fajr-count">0</div>
+      <div class="buttons">
+        <button onclick="updateCount('Fajr', 1)">+</button>
+        <button onclick="customAdd('Fajr')">Custom</button>
+        <button onclick="updateCount('Fajr', -1)">-</button>
+      </div>
+    </div>
+
+    <div class="prayer" data-prayer="Dhuhr">
+      <span>Dhuhr</span>
+      <div class="count" id="Dhuhr-count">0</div>
+      <div class="buttons">
+        <button onclick="updateCount('Dhuhr', 1)">+</button>
+        <button onclick="customAdd('Dhuhr')">Custom</button>
+        <button onclick="updateCount('Dhuhr', -1)">-</button>
+      </div>
+    </div>
+
+    <div class="prayer" data-prayer="Asr">
+      <span>Asr</span>
+      <div class="count" id="Asr-count">0</div>
+      <div class="buttons">
+        <button onclick="updateCount('Asr', 1)">+</button>
+        <button onclick="customAdd('Asr')">Custom</button>
+        <button onclick="updateCount('Asr', -1)">-</button>
+      </div>
+    </div>
+
+    <div class="prayer" data-prayer="Maghrib">
+      <span>Maghrib</span>
+      <div class="count" id="Maghrib-count">0</div>
+      <div class="buttons">
+        <button onclick="updateCount('Maghrib', 1)">+</button>
+        <button onclick="customAdd('Maghrib')">Custom</button>
+        <button onclick="updateCount('Maghrib', -1)">-</button>
+      </div>
+    </div>
+
+    <div class="prayer" data-prayer="Isha">
+      <span>Isha</span>
+      <div class="count" id="Isha-count">0</div>
+      <div class="buttons">
+        <button onclick="updateCount('Isha', 1)">+</button>
+        <button onclick="customAdd('Isha')">Custom</button>
+        <button onclick="updateCount('Isha', -1)">-</button>
+      </div>
+    </div>
+
+    <div class="prayer" data-prayer="Witr">
+      <span>Witr</span>
+      <div class="count" id="Witr-count">0</div>
+      <div class="buttons">
+        <button onclick="updateCount('Witr', 1)">+</button>
+        <button onclick="customAdd('Witr')">Custom</button>
+        <button onclick="updateCount('Witr', -1)">-</button>
+      </div>
+    </div>
+
+    <div class="total">Total Missed: <span id="total">0</span></div>
+    <button class="reset" onclick="resetAll()">Reset All</button>
+  </div>
+
+  <script>
+    // Load saved data
+    window.onload = function() {
+      let savedData = JSON.parse(localStorage.getItem("qazaTracker")) || {};
+      for (let prayer of ["Fajr","Dhuhr","Asr","Maghrib","Isha","Witr"]) {
+        let el = document.getElementById(prayer + "-count");
+        el.textContent = savedData[prayer] || 0;
+      }
+      updateTotal();
+    }
+
+    function saveData() {
+      let data = {};
+      document.querySelectorAll(".prayer").forEach(prayerEl => {
+        let prayer = prayerEl.getAttribute("data-prayer");
+        let count = parseInt(prayerEl.querySelector(".count").textContent) || 0;
+        data[prayer] = count;
+      });
+      localStorage.setItem("qazaTracker", JSON.stringify(data));
+    }
+
+    function animateCount(el) {
+      el.classList.remove("pop");
+      void el.offsetWidth; // restart animation
+      el.classList.add("pop");
+    }
+
+    function updateCount(prayer, value) {
+      let el = document.getElementById(prayer + "-count");
+      let count = parseInt(el.textContent) || 0;
+      count += value;
+      if (count < 0) count = 0;
+      el.textContent = count;
+      animateCount(el);
+      updateTotal();
+      saveData();
+    }
+
+    function customAdd(prayer) {
+      let val = prompt("Enter number to add:");
+      if (val !== null && !isNaN(val)) {
+        updateCount(prayer, parseInt(val));
+      }
+    }
+
+    function updateTotal() {
+      let total = 0;
+      document.querySelectorAll(".count").forEach(el => {
+        total += parseInt(el.textContent) || 0;
+      });
+      document.getElementById("total").textContent = total;
+    }
+
+    function resetAll() {
+      document.querySelectorAll(".count").forEach(el => el.textContent = 0);
+      updateTotal();
+      saveData();
+    }
+  </script>
+</body>
+</html>

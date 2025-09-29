@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasbeeh Counter - Neomorphic</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #e0e0e0; /* Neumorphic background */
+      height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .app-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Top control buttons */
+    .top-controls {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    
+    .control-btn {
+      margin-left: 20px;
+      margin-right: 20px;
+      background: #e0e0e0;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 22px;
+      color: #4a148c;
+      cursor: pointer;
+      box-shadow: 5px 5px 12px #bebebe, -5px -5px 12px #ffffff;
+      transition: all 0.2s ease;
+    }
+    .control-btn:active {
+      box-shadow: inset 5px 5px 12px #bebebe, inset -5px -5px 12px #ffffff;
+    }
+
+    /* Neomorphic Circle */
+    .circle {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      box-shadow: 10px 10px 20px #bebebe, -10px -10px 20px #ffffff;
+      overflow: hidden;
+    }
+
+    /* Embossed progress ring */
+    .progress {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(#4a148c var(--progress, 0%), transparent 0);
+      mask: radial-gradient(farthest-side, transparent calc(100% - 14px), black 0);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 14px), black 0);
+      z-index: 1;
+      box-shadow: inset 5px 5px 12px #bebebe, inset -5px -5px 12px #ffffff;
+    }
+
+    .counter {
+      font-size: 60px;
+      font-weight: bold;
+      z-index: 2;
+      color: #4a148c; /* Deep purple */
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    /* Target text */
+    .target {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 18px;
+      opacity: 0.9;
+      color: #4a148c;
+    }
+
+    /* Set target button */
+    .set-target-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: #e0e0e0;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      color: #4a148c;
+      cursor: pointer;
+      box-shadow: 5px 5px 12px #bebebe, -5px -5px 12px #ffffff;
+      transition: all 0.2s ease;
+    }
+    .set-target-btn:active {
+      box-shadow: inset 5px 5px 12px #bebebe, inset -5px -5px 12px #ffffff;
+    }
+
+    /* Settings Popup */
+    .settings {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #e0e0e0;
+      padding: 20px;
+      border-radius: 20px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      color: #333;
+      z-index: 9999;
+      width: 250px;
+      box-shadow: 10px 10px 20px #bebebe, -10px -10px 20px #ffffff;
+    }
+
+    .settings h3 {
+      margin-bottom: 10px;
+      color: #4a148c;
+    }
+
+    .close-settings {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: #4a148c;
+      font-size: 22px;
+      line-height: 36px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 4px 4px 8px #bebebe, -4px -4px 8px #ffffff;
+    }
+    .close-settings:active {
+      box-shadow: inset 4px 4px 8px #bebebe, inset -4px -4px 8px #ffffff;
+    }
+
+    .settings input {
+      padding: 10px;
+      margin: 12px 0;
+      width: 150px;
+      border: none;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 18px;
+      background: #e0e0e0;
+      box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+      outline: none;
+    }
+
+    .settings button {
+      margin-top: 8px;
+      background: #e0e0e0;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #4a148c;
+      box-shadow: 5px 5px 12px #bebebe, -5px -5px 12px #ffffff;
+      transition: all 0.2s ease;
+    }
+    .settings button:active {
+      box-shadow: inset 5px 5px 12px #bebebe, inset -5px -5px 12px #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" id="app">
+    <div class="top-controls">
+      <button class="control-btn" id="decrement">➖</button>
+            <button class="control-btn" id="decrement">Add Zikr</button>
+      <button class="control-btn" id="reset">🔄</button>
+    </div>
+
+    <div class="circle">
+      <div class="progress" id="progress"></div>
+      <div class="counter" id="counter">0</div>
+    </div>
+  
+    <div class="target" id="target">Target: 100</div>
+    <button class="set-target-btn" id="openSettings">Set Target</button>
+  </div>
+
+  <!-- Settings popup -->
+  <div class="settings" id="settingsPopup">
+    <button class="close-settings" id="closeSettings" aria-label="Close settings">×</button>
+    <h3>Set Target</h3>
+    <input type="number" id="targetInput" />
+    <button id="saveTarget">Save</button>
+  </div>
+
+  <!-- Sound -->
+  <audio id="ding" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+  <script>
+    const closeSettingsBtn = document.getElementById("closeSettings");
+    const settingsPopup = document.getElementById("settingsPopup");
+    const targetInput = document.getElementById("targetInput");
+    const saveTargetBtn = document.getElementById("saveTarget");
+    const openSettingsBtn = document.getElementById("openSettings");
+
+    // Close popup
+    closeSettingsBtn.addEventListener("click", () => {
+      settingsPopup.style.display = "none";
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && settingsPopup.style.display !== "none") {
+        settingsPopup.style.display = "none";
+      }
+    });
+
+    // Load saved values
+    let count = parseInt(localStorage.getItem("tasbeehCount")) || 0;
+    let target = parseInt(localStorage.getItem("tasbeehTarget")) || 100;
+
+    const counter = document.getElementById("counter");
+    const progress = document.getElementById("progress");
+    const targetLabel = document.getElementById("target");
+    const decrementBtn = document.getElementById("decrement");
+    const resetBtn = document.getElementById("reset");
+    const ding = document.getElementById("ding");
+
+    function updateUI() {
+      counter.textContent = count;
+      let percent = (count / target) * 100;
+      progress.style.setProperty("--progress", percent + "%");
+      targetLabel.textContent = "Target: " + target;
+
+      localStorage.setItem("tasbeehCount", count);
+      localStorage.setItem("tasbeehTarget", target);
+    }
+
+    // Increment on screen tap
+    document.getElementById("app").addEventListener("click", (e) => {
+      if (e.target.closest(".control-btn") || e.target.closest(".set-target-btn")) return; 
+      
+      count++;
+
+      if ("vibrate" in navigator) navigator.vibrate([200]); 
+
+      if (count >= target) {
+        count = target;
+        ding.play();
+        if (navigator.vibrate) navigator.vibrate([100, 80, 100]);
+      }
+
+      updateUI();
+    });
+
+    decrementBtn.addEventListener("click", () => {
+      if (count > 0) count--;
+      updateUI();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      count = 0;
+      updateUI();
+    });
+
+    openSettingsBtn.addEventListener("click", () => {
+      settingsPopup.style.display = "flex";
+      targetInput.value = target;
+      setTimeout(() => targetInput.focus(), 100);
+    });
+
+    saveTargetBtn.addEventListener("click", () => {
+      let newTarget = parseInt(targetInput.value);
+      if (newTarget > 0) {
+        target = newTarget;
+        count = 0;
+        updateUI();
+      }
+      settingsPopup.style.display = "none";
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>

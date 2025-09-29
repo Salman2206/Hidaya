@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quran – Paras & Surahs</title>
+<style>
+  :root{
+    --lavender-1:#f8e1f4;
+    --lavender-2:#e7d6f9;
+    --card:#ffffff;
+    --accent:#7a35d0;
+    --accent-2:#9c5df0;
+    --muted:#6c6c6c;
+    --ring:#e7c8f3;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background:linear-gradient(180deg,var(--lavender-1),var(--lavender-2));
+    color:#222;
+  }
+
+  /* Top bar with quick surahs */
+  .top{
+    position:sticky; top:0; z-index:50;
+    background:linear-gradient(180deg,var(--lavender-1),var(--lavender-2));
+    padding:12px 14px 8px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+  }
+  .title{
+    font-weight:800; letter-spacing:.3px;
+    color:#4a2a88; font-size:22px; margin:0 0 10px;
+  }
+  .quick-wrap{
+    display:flex; gap:8px; overflow:auto; padding-bottom:6px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .chip{
+    flex:0 0 auto; padding:8px 12px; border-radius:999px;
+    background:var(--card); border:1px solid var(--ring);
+    color:#4a2a88; font-weight:600; font-size:14px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);
+    cursor:pointer; transition:transform .15s ease;
+    white-space:nowrap;
+  }
+  .chip:active{transform:scale(.97)}
+
+  /* Tabs */
+  .tabs{
+    display:flex; justify-content:space-around;
+    background:#f1e7fb; padding:10px 0; border-top:1px solid #e7d6f9;
+    border-bottom:2px solid #d9c3f5;
+    position:sticky; top:72px; z-index:40;
+  }
+  .tab-btn{
+    flex:1; text-align:center; font-weight:700;
+    color:#582aab; padding:6px 0; cursor:pointer;
+  }
+  .tab-btn.active{ color:#fff; background:#7a35d0; border-radius:20px; margin:0 6px; }
+
+  .list{ padding:10px 12px 24px; display:none; }
+  .list.active{ display:block; }
+
+  .card{
+    display:flex; align-items:center; gap:12px;
+    background:var(--card); border-radius:20px;
+    margin:10px 6px; padding:12px 14px;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+    transition:transform .12s ease, box-shadow .2s ease;
+  }
+  .card:active{ transform:scale(.98); box-shadow:0 8px 24px rgba(0,0,0,.10); }
+
+  .circle{
+    width:36px; height:36px; border-radius:25%;
+    background:var(--ring); color:#3a206e;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700;
+  }
+  .info{ display:flex; align-items:center; gap:10px; width:100%; }
+  .grow{ flex:1; min-width:0; }
+  .label{ font-weight:700; color:#3a206e; }
+  .muted{ color:var(--muted); font-size:13px; }
+
+  html{ scroll-padding-top:120px; }
+</style>
+</head>
+<body>
+
+  <!-- Top: Quick access chips -->
+  <div class="top">
+    <h1 class="title">Most Read Surahs</h1>
+    <div class="quick-wrap" id="quickSurahs"></div>
+  
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab-btn active" data-tab="paraList">Para</div>
+    <div class="tab-btn" data-tab="surahList">Surah</div>
+    <div class="tab-btn" data-tab="bookmarkList">Bookmark</div>
+  </div>
+</div>
+  <!-- Lists -->
+  <div class="list active" id="paraList"></div>
+  <div class="list" id="surahList"></div>
+  <div class="list" id="bookmarkList">No bookmarks yet</div>
+
+<script>
+/* --------- Data --------- */
+const popularSurahs = [
+  {num:36, name:'Yaseen'}, {num:67, name:'Mulk'},
+  {num:56, name:'Waqiah'}, {num:18, name:'Kahf'},
+  {num:55, name:'Rahman'}, {num:112, name:'Ikhlas'},
+  {num:113, name:'Falaq'}, {num:114, name:'Nas'}
+];
+
+// ---- Para (Juz) list manual ----
+ const paras = [ 
+  {n:1,  name:"Alif Laam Meem", ayah:141},
+{n:2,  name:"Sayaqool", ayah:111},
+{n:3,  name:"Tilkal Rusull", ayah:120},
+{n:4,  name:"Lan Tana Loo", ayah:176},
+{n:5,  name:"Wal Mohsanat", ayah:120},
+{n:6,  name:"Ya Ayyuhal Lazeena Amanoo", ayah:165},
+{n:7,  name:"Wa Iza Samiu", ayah:206},
+{n:8,  name:"Wa Lau Annana", ayah:75},
+{n:9,  name:"Qad Aflaha", ayah:129},
+{n:10, name:"Wa A'lamu", ayah:109},
+{n:11, name:"Yatazeroon", ayah:123},
+{n:12, name:"Wa Mamin Da’abat", ayah:111},
+{n:13, name:"Wa Matar", ayah:43},
+{n:14, name:"Rubama", ayah:52},
+{n:15, name:"Subhanallazi", ayah:99},
+{n:16, name:"Qal Alam", ayah:128},
+{n:17, name:"Aqtarabat", ayah:111},
+{n:18, name:"Qadd Aflaha", ayah:110},
+{n:19, name:"Wa Qalallazina", ayah:98},
+{n:20, name:"A'man Khalaq", ayah:135},
+{n:21, name:"Utlu Ma Oohi", ayah:112},
+{n:22, name:"Wa Manyaqnut", ayah:78},
+{n:23, name:"Wa Mali", ayah:118},
+{n:24, name:"Faman Azlam", ayah:122},
+{n:25, name:"Ilaihi Yuruddu", ayah:77},
+{n:26, name:"Ha Meem", ayah:227},
+{n:27, name:"Qala Fama Khatbukum", ayah:93},
+{n:28, name:"Qadd Sami Allah", ayah:88},
+{n:29, name:"Tabarakallazi", ayah:69},
+{n:30, name:"Amma Yatasa'aloon", ayah:78}
+];
+
+  // continue adding manually till 30
+
+// ---- Surah list ----
+const surahs = [
+  {n:1, name:"Al-Fatihah", ayah:7},
+  {n:2, name:"Al-Baqarah", ayah:286},
+  {n:3, name:"Aal-E-Imran", ayah:200},
+  {n:4, name:"An-Nisa", ayah:176},
+  {n:5, name:"Al-Maidah", ayah:120},
+  {n:6, name:"Al-An'am", ayah:165},
+  {n:7, name:"Al-A'raf", ayah:206},
+  {n:8, name:"Al-Anfal", ayah:75},
+  {n:9, name:"At-Tawbah", ayah:129},
+  {n:10, name:"Yunus", ayah:109},
+  {n:11, name:"Hud", ayah:123},
+  {n:12, name:"Yusuf", ayah:111},
+  {n:13, name:"Ar-Ra'd", ayah:43},
+  {n:14, name:"Ibrahim", ayah:52},
+  {n:15, name:"Al-Hijr", ayah:99},
+  {n:16, name:"An-Nahl", ayah:128},
+  {n:17, name:"Al-Isra", ayah:111},
+  {n:18, name:"Al-Kahf", ayah:110},
+  {n:19, name:"Maryam", ayah:98},
+  {n:20, name:"Ta-Ha", ayah:135},
+  {n:21, name:"Al-Anbiya", ayah:112},
+  {n:22, name:"Al-Hajj", ayah:78},
+  {n:23, name:"Al-Mu'minun", ayah:118},
+  {n:24, name:"An-Nur", ayah:64},
+  {n:25, name:"Al-Furqan", ayah:77},
+  {n:26, name:"Ash-Shu'ara", ayah:227},
+  {n:27, name:"An-Naml", ayah:93},
+  {n:28, name:"Al-Qasas", ayah:88},
+  {n:29, name:"Al-Ankabut", ayah:69},
+  {n:30, name:"Ar-Rum", ayah:60},
+  {n:31, name:"Luqman", ayah:34},
+  {n:32, name:"As-Sajda", ayah:30},
+  {n:33, name:"Al-Ahzab", ayah:73},
+  {n:34, name:"Saba", ayah:54},
+  {n:35, name:"Fatir", ayah:45},
+  {n:36, name:"Ya-Sin", ayah:83},
+  {n:37, name:"As-Saffat", ayah:182},
+  {n:38, name:"Sad", ayah:88},
+  {n:39, name:"Az-Zumar", ayah:75},
+  {n:40, name:"Ghafir", ayah:85},
+  {n:41, name:"Fussilat", ayah:54},
+  {n:42, name:"Ash-Shura", ayah:53},
+  {n:43, name:"Az-Zukhruf", ayah:89},
+  {n:44, name:"Ad-Dukhan", ayah:59},
+  {n:45, name:"Al-Jathiya", ayah:37},
+  {n:46, name:"Al-Ahqaf", ayah:35},
+  {n:47, name:"Muhammad", ayah:38},
+  {n:48, name:"Al-Fath", ayah:29},
+  {n:49, name:"Al-Hujurat", ayah:18},
+  {n:50, name:"Qaf", ayah:45},
+  {n:51, name:"Adh-Dhariyat", ayah:60},
+  {n:52, name:"At-Tur", ayah:49},
+  {n:53, name:"An-Najm", ayah:62},
+  {n:54, name:"Al-Qamar", ayah:55},
+  {n:55, name:"Ar-Rahman", ayah:78},
+  {n:56, name:"Al-Waqia", ayah:96},
+  {n:57, name:"Al-Hadid", ayah:29},
+  {n:58, name:"Al-Mujadila", ayah:22},
+  {n:59, name:"Al-Hashr", ayah:24},
+  {n:60, name:"Al-Mumtahina", ayah:13},
+  {n:61, name:"As-Saff", ayah:14},
+  {n:62, name:"Al-Jumua", ayah:11},
+  {n:63, name:"Al-Munafiqoon", ayah:11},
+  {n:64, name:"At-Taghabun", ayah:18},
+  {n:65, name:"At-Talaq", ayah:12},
+  {n:66, name:"At-Tahrim", ayah:12},
+  {n:67, name:"Al-Mulk", ayah:30},
+  {n:68, name:"Al-Qalam", ayah:52},
+  {n:69, name:"Al-Haqqa", ayah:52},
+  {n:70, name:"Al-Maarij", ayah:44},
+  {n:71, name:"Nuh", ayah:28},
+  {n:72, name:"Al-Jinn", ayah:28},
+  {n:73, name:"Al-Muzzammil", ayah:20},
+  {n:74, name:"Al-Muddaththir", ayah:56},
+  {n:75, name:"Al-Qiyama", ayah:40},
+  {n:76, name:"Al-Insan", ayah:31},
+  {n:77, name:"Al-Mursalat", ayah:50},
+  {n:78, name:"An-Naba", ayah:40},
+  {n:79, name:"An-Nazi'at", ayah:46},
+  {n:80, name:"Abasa", ayah:42},
+  {n:81, name:"At-Takwir", ayah:29},
+  {n:82, name:"Al-Infitar", ayah:19},
+  {n:83, name:"Al-Mutaffifin", ayah:36},
+  {n:84, name:"Al-Inshiqaq", ayah:25},
+  {n:85, name:"Al-Buruj", ayah:22},
+  {n:86, name:"At-Tariq", ayah:17},
+  {n:87, name:"Al-Ala", ayah:19},
+  {n:88, name:"Al-Ghashiya", ayah:26},
+  {n:89, name:"Al-Fajr", ayah:30},
+  {n:90, name:"Al-Balad", ayah:20},
+  {n:91, name:"Ash-Shams", ayah:15},
+  {n:92, name:"Al-Lail", ayah:21},
+  {n:93, name:"Ad-Duha", ayah:11},
+  {n:94, name:"Ash-Sharh", ayah:8},
+  {n:95, name:"At-Tin", ayah:8},
+  {n:96, name:"Al-Alaq", ayah:19},
+  {n:97, name:"Al-Qadr", ayah:5},
+  {n:98, name:"Al-Bayyina", ayah:8},
+  {n:99, name:"Az-Zalzala", ayah:8},
+  {n:100, name:"Al-Adiyat", ayah:11},
+  {n:101, name:"Al-Qaria", ayah:11},
+  {n:102, name:"At-Takathur", ayah:8},
+  {n:103, name:"Al-Asr", ayah:3},
+  {n:104, name:"Al-Humaza", ayah:9},
+  {n:105, name:"Al-Fil", ayah:5},
+  {n:106, name:"Quraish", ayah:4},
+  {n:107, name:"Al-Maun", ayah:7},
+  {n:108, name:"Al-Kawthar", ayah:3},
+  {n:109, name:"Al-Kafiroon", ayah:6},
+  {n:110, name:"An-Nasr", ayah:3},
+  {n:111, name:"Al-Masad", ayah:5},
+  {n:112, name:"Al-Ikhlas", ayah:4},
+  {n:113, name:"Al-Falaq", ayah:5},
+  {n:114, name:"An-Nas", ayah:6}
+  // full list you already added earlier
+];
+
+/* --------- Render helpers --------- */
+const qWrap = document.getElementById('quickSurahs');
+const surahList = document.getElementById('surahList');
+const paraList = document.getElementById('paraList');
+
+function renderQuick() {
+  popularSurahs.forEach(s => {
+    const link = document.createElement('a');
+    link.href = `surah${s.num}.html`; // links like surah36.html, surah67.html etc.
+    link.style.textDecoration = 'none';
+
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = `${s.name} (${s.num})`;
+
+    link.appendChild(btn);
+    qWrap.appendChild(link);
+  });
+}
+
+
+function renderParas(){
+  paras.forEach(p=>{
+    // Create clickable anchor for each para
+    const link = document.createElement('a');
+    link.href = `juz${p.n}.html`;   // links like juz1.html, juz2.html etc.
+    link.style.textDecoration = 'none';
+    link.style.color = 'inherit';
+
+    const card = document.createElement('div'); 
+    card.className='card';
+    card.setAttribute('data-para', p.n);
+
+    const circ = document.createElement('div'); 
+    circ.className='circle'; 
+    circ.textContent=p.n;
+
+    const info = document.createElement('div'); 
+    info.className='info';
+
+    const left = document.createElement('div'); 
+    left.className='grow';
+    left.innerHTML = `<div class="label">${p.name}</div><div class="sub">${p.ayah} ayat</div>`;
+
+    info.append(left);
+    card.append(circ, info);
+    link.appendChild(card); // wrap card inside link
+    paraList.appendChild(link);
+  });
+}
+
+function renderSurahs(){
+  surahs.forEach(s=>{
+    // Create clickable anchor for each surah
+    const link = document.createElement('a');
+    link.href = `surah${s.n}.html`;   // links like surah1.html, surah2.html etc.
+    link.style.textDecoration = 'none';
+    link.style.color = 'inherit';
+
+    const card = document.createElement('div'); 
+    card.className='card';
+    card.setAttribute('data-surah', s.n);
+
+    const circ = document.createElement('div'); 
+    circ.className='circle'; 
+    circ.textContent=s.n;
+
+    const info = document.createElement('div'); 
+    info.className='info';
+
+    const left = document.createElement('div'); 
+    left.className='grow';
+    left.innerHTML = `<div class="label">${s.name}</div><div class="sub">${s.ayah} ayat</div>`;
+
+    info.append(left);
+    card.append(circ, info);
+    link.appendChild(card); // wrap card inside link
+    surahList.appendChild(link);
+  });
+}
+
+/* --------- Bookmarks --------- */
+
+/* ---------- Full Juz Mapping ---------- */
+function getJuzForAyah(surahNum, ayahNum) {
+  const juzBoundaries = [
+    { surah: 1, ayah: 1 },    // Juz 1
+    { surah: 2, ayah: 142 },  // Juz 2
+    { surah: 2, ayah: 253 },  // Juz 3
+    { surah: 3, ayah: 93 },   // Juz 4
+    { surah: 4, ayah: 24 },   // Juz 5
+    { surah: 4, ayah: 148 },  // Juz 6
+    { surah: 5, ayah: 82 },   // Juz 7
+    { surah: 6, ayah: 111 },  // Juz 8
+    { surah: 7, ayah: 88 },   // Juz 9
+    { surah: 8, ayah: 41 },   // Juz 10
+    { surah: 9, ayah: 93 },   // Juz 11
+    { surah: 11, ayah: 6 },   // Juz 12
+    { surah: 12, ayah: 53 },  // Juz 13
+    { surah: 15, ayah: 1 },   // Juz 14
+    { surah: 17, ayah: 1 },   // Juz 15
+    { surah: 18, ayah: 75 },  // Juz 16
+    { surah: 21, ayah: 1 },   // Juz 17
+    { surah: 23, ayah: 1 },   // Juz 18
+    { surah: 25, ayah: 21 },  // Juz 19
+    { surah: 27, ayah: 56 },  // Juz 20
+    { surah: 29, ayah: 46 },  // Juz 21
+    { surah: 33, ayah: 31 },  // Juz 22
+    { surah: 36, ayah: 28 },  // Juz 23
+    { surah: 39, ayah: 32 },  // Juz 24
+    { surah: 41, ayah: 47 },  // Juz 25
+    { surah: 46, ayah: 1 },   // Juz 26
+    { surah: 51, ayah: 31 },  // Juz 27
+    { surah: 58, ayah: 1 },   // Juz 28
+    { surah: 67, ayah: 1 },   // Juz 29
+    { surah: 78, ayah: 1 },   // Juz 30
+  ];
+
+  let juz = 30; // default last Juz
+  for (let i = 0; i < juzBoundaries.length; i++) {
+    const b = juzBoundaries[i];
+    const next = juzBoundaries[i + 1];
+    if (
+      (surahNum > b.surah || (surahNum == b.surah && ayahNum >= b.ayah)) &&
+      (!next ||
+        surahNum < next.surah ||
+        (surahNum == next.surah && ayahNum < next.ayah))
+    ) {
+      juz = i + 1;
+      break;
+    }
+  }
+  return juz;
+}
+
+/* ---------- Bookmark Renderer ---------- */
+function renderBookmarks() {
+  const wrap = document.getElementById("bookmarkList");
+  wrap.innerHTML = "";
+
+  const bookmarks = JSON.parse(localStorage.getItem("bookmarks") || "[]");
+
+  if (bookmarks.length === 0) {
+    wrap.innerHTML = `<div style="text-align:center; padding:40px; color:#666;">No bookmarks yet 📑</div>`;
+    return;
+  }
+
+  bookmarks.forEach((b) => {
+    const [sNum, aNum] = b.split(":");
+    const surah = surahs.find((s) => s.n == sNum);
+
+    const juz = getJuzForAyah(Number(sNum), Number(aNum));
+    const juzPage = `juz${juz}.html`;
+
+    const link = document.createElement("a");
+    link.href = `${juzPage}#ayah-${sNum}:${aNum}`;
+    link.style.textDecoration = "none";
+    link.style.color = "inherit";
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const circ = document.createElement("div");
+    circ.className = "circle";
+    circ.textContent = sNum;
+
+    const info = document.createElement("div");
+    info.className = "info";
+
+    const left = document.createElement("div");
+    left.className = "grow";
+    left.innerHTML = `
+      <div class="label">${surah ? surah.name : "Surah " + sNum}</div>
+      <div class="muted">Ayah ${aNum} — <b>Juz ${juz}</b></div>
+    `;
+
+    info.append(left);
+    card.append(circ, info);
+    link.appendChild(card);
+    wrap.appendChild(link);
+  });
+}
+
+/* --------- Tabs --------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.list').forEach(l=>l.classList.remove('active'));
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* --------- Init --------- */
+renderQuick();
+renderParas();
+renderSurahs();
+renderBookmarks();
+</script>
+</body>
+</html>

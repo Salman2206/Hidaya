@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dua Collection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3e6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background: #9c5df0;
+      color: white;
+      text-align: center;
+      padding: 14px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      box-shadow: 0px 2px 10px rgba(0,0,0,0.15);
+    }
+
+    .container {
+      width: 95%;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .dua-card {
+      background: #fff;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .dua-header {
+      padding: 16px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #6a1b9a;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .arrow {
+      transition: transform 0.3s ease;
+    }
+
+    .arrow.open {
+      transform: rotate(90deg);
+    }
+
+    .dua-content {
+      display: none;
+      padding: 16px;
+      border-top: 1px solid #eee;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dua-arabic {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #000;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .dua-hinglish {
+      font-style: italic;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .dua-translation {
+      font-size: 1rem;
+      color: #444;
+      line-height: 1.4;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    📖 Dua Collection
+  </div>
+
+  <div class="container">
+    <!-- Category Dropdown -->
+    <select id="categoryFilter">
+      <option value="all">All Categories</option>
+      <option value="khana">Khana</option>
+      <option value="pani">Pani</option>
+      <option value="sona">Sona</option>
+      <option value="safar">Safar</option>
+      <option value="kabristan">Kabristan</option>
+    </select>
+
+    <!-- Search -->
+    <input type="text" id="searchBox" placeholder="Search Dua...">
+
+    <!-- Dua List -->
+    <div id="duaList"></div>
+  </div>
+
+  <script>
+    // Embedded JSON data
+const duas = [
+  // 🌙 Eating & Drinking
+  { "title": "Khana shuru karne ki dua", "arabic": "بِسْمِ اللهِ وَعَلَى بَرَكَةِ الله", "hinglish": "Bismillahi wa 'ala barakatillah", "translation": "In the name of Allah and with His blessings", "category": "khana" },
+  { "title": "Khana khatam karne ki dua", "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا", "hinglish": "Alhamdu lillahilladhi at'amani hadha", "translation": "All praise is for Allah who fed me this", "category": "khana" },
+  { "title": "Khana bhool jane ki dua", "arabic": "بِسْمِ اللَّهِ أَوَّلَهُ وَآخِرَهُ", "hinglish": "Bismillahi awwalahu wa aakhirahu", "translation": "In the name of Allah in its beginning and its end", "category": "khana" },
+  { "title": "Pani pine ki dua", "arabic": "بِسْمِ الله", "hinglish": "Bismillah", "translation": "In the name of Allah", "category": "pani" },
+  { "title": "Pani khatam hone ki dua", "arabic": "الْحَمْدُ لِلَّهِ", "hinglish": "Alhamdulillah", "translation": "All praise is for Allah", "category": "pani" },
+  { "title": "Doodh pine ki dua", "arabic": "اللَّهُمَّ بَارِكْ لَنَا فِيهِ وَزِدْنَا مِنْهُ", "hinglish": "Allahumma barik lana fihi wa zidna minhu", "translation": "O Allah, bless it for us and give us more of it", "category": "pani" },
+  { "title": "Naya khana milne par dua", "arabic": "اللَّهُمَّ أَطْعِمْ مَنْ أَطْعَمَنِي", "hinglish": "Allahumma at'im man at'amani", "translation": "O Allah, feed the one who fed me", "category": "khana" },
+
+  // 🌙 Sleeping & Waking
+  { "title": "Sone se pehle ki dua", "arabic": "اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا", "hinglish": "Allahumma bismika amutu wa ahya", "translation": "O Allah, in Your name I live and die", "category": "sona" },
+  { "title": "Uthne ki dua", "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا", "hinglish": "Alhamdu lillahil-ladhi ahyana", "translation": "All praise is for Allah who gave us life", "category": "sona" },
+  { "title": "Kapde pehnne ki dua", "arabic": "الْحَمْدُ لِلَّهِ الَّذِي كَسَانِي", "hinglish": "Alhamdulillahil-ladhi kasani", "translation": "All praise is for Allah who clothed me", "category": "sona" },
+  { "title": "Kapde utarne ki dua", "arabic": "بِسْمِ اللَّهِ", "hinglish": "Bismillah", "translation": "In the name of Allah", "category": "sona" },
+  { "title": "Naye kapde pehnne ki dua", "arabic": "اللَّهُمَّ لَكَ الْحَمْدُ أَنْتَ كَسَوْتَنِيهِ", "hinglish": "Allahumma lakal-hamdu anta kasawtaniyhi", "translation": "O Allah, praise is to You, You clothed me with it", "category": "sona" },
+
+  // 🌙 Travel & Safety
+  { "title": "Safar ki dua", "arabic": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا", "hinglish": "Subhanalladhi sakhkhara lana hadha", "translation": "Glory be to Him who has subjected this to us", "category": "safar" },
+  { "title": "Safar se lautne ki dua", "arabic": "آيِبُونَ تَائِبُونَ عَابِدُونَ", "hinglish": "Aayibuna ta’ibuna ‘abiduna", "translation": "Returning, repenting, worshipping", "category": "safar" },
+  { "title": "Ghar se nikalne ki dua", "arabic": "بِسْمِ اللهِ تَوَكَّلْتُ عَلَى الله", "hinglish": "Bismillahi tawakkaltu 'alallah", "translation": "In the name of Allah, I place my trust in Allah", "category": "ghar" },
+  { "title": "Ghar me dakhil hone ki dua", "arabic": "بِسْمِ اللَّهِ وَلَجْنَا", "hinglish": "Bismillahi walajna", "translation": "In the name of Allah we enter", "category": "ghar" },
+  { "title": "Safar ke waqt tasbih", "arabic": "اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ", "hinglish": "Allahu Akbar Allahu Akbar Allahu Akbar", "translation": "Allah is the Greatest, Allah is the Greatest, Allah is the Greatest", "category": "safar" },
+
+  // 🌙 Masjid & Namaz
+  { "title": "Masjid me dakhil hone ki dua", "arabic": "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ", "hinglish": "Allahummaftah li abwaba rahmatika", "translation": "O Allah, open for me the doors of Your mercy", "category": "masjid" },
+  { "title": "Masjid se nikalne ki dua", "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ", "hinglish": "Allahumma inni as’aluka min fadhlik", "translation": "O Allah, I ask You for Your bounty", "category": "masjid" },
+  { "title": "Azan sunne ki dua", "arabic": "اللَّهُمَّ رَبَّ هَذِهِ الدَّعْوَةِ التَّامَّةِ", "hinglish": "Allahumma rabba hadhihid da’watit taammah", "translation": "O Allah, Lord of this perfect call...", "category": "namaz" },
+  { "title": "Wuzu ke baad ki dua", "arabic": "أَشْهَدُ أَنْ لَا إِلٰهَ إِلَّا اللَّه", "hinglish": "Ashhadu alla ilaha illallah", "translation": "I bear witness there is no god but Allah", "category": "namaz" },
+  { "title": "Namaz ke baad ki dua", "arabic": "أَسْتَغْفِرُ اللَّهَ", "hinglish": "Astaghfirullah", "translation": "I seek forgiveness from Allah", "category": "namaz" },
+
+  // 🌙 Kabristan
+  { "title": "Kabristan me dua", "arabic": "السَّلَامُ عَلَيْكُمْ أَهْلَ الدِّيَارِ", "hinglish": "Assalamu 'alaykum ahlad-diyar", "translation": "Peace be upon you, O inhabitants of the graves", "category": "kabristan" },
+  { "title": "Mayyat ko dekhne ki dua", "arabic": "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ", "hinglish": "Inna lillahi wa inna ilayhi raji’un", "translation": "Indeed we belong to Allah and to Him we return", "category": "kabristan" },
+
+  // 🌙 Daily life & Others
+  { "title": "Shukriya ada karne ki dua", "arabic": "جَزَاكَ اللَّهُ خَيْرًا", "hinglish": "Jazakallahu khayran", "translation": "May Allah reward you with goodness", "category": "rozmarra" },
+  { "title": "Chinkne par jawab", "arabic": "يَرْحَمُكَ اللَّه", "hinglish": "Yarhamukallah", "translation": "May Allah have mercy on you", "category": "rozmarra" },
+  { "title": "Gusse me dua", "arabic": "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ", "hinglish": "A’udhu billahi minash-shaytan", "translation": "I seek refuge in Allah from Satan", "category": "rozmarra" },
+  { "title": "Bazaar me dakhil hone ki dua", "arabic": "لَا إِلٰهَ إِلَّا اللَّهُ وَحْدَهُ", "hinglish": "La ilaha illallahu wahdahu", "translation": "None has the right to be worshipped but Allah alone", "category": "rozmarra" },
+  { "title": "Dukh me padhne ki dua", "arabic": "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ", "hinglish": "Inna lillahi wa inna ilayhi raji’un", "translation": "We belong to Allah and to Him we shall return", "category": "dukh" },
+  { "title": "Nazar se bachne ki dua", "arabic": "مَا شَاءَ اللَّهُ لَا قُوَّةَ إِلَّا بِاللَّهِ", "hinglish": "Ma sha Allah la quwwata illa billah", "translation": "What Allah wills, there is no power except with Allah", "category": "protection" },
+  { "title": "Dar se bachne ki dua", "arabic": "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", "hinglish": "Hasbunallahu wa ni’mal wakeel", "translation": "Allah is sufficient for us and the best disposer of affairs", "category": "protection" },
+  { "title": "Dukh takleef me dua", "arabic": "اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ", "hinglish": "Allahumma rabban-naas adhhibi al-ba’sa", "translation": "O Lord of mankind, remove this difficulty", "category": "protection" },
+  { "title": "Musibat me dua", "arabic": "اللَّهُمَّ أَجِرْنِي فِي مُصِيبَتِي", "hinglish": "Allahumma ajirni fi musibati", "translation": "O Allah, reward me in my calamity", "category": "dukh" },
+  { "title": "Barish ki dua", "arabic": "اللَّهُمَّ صَيِّبًا نَافِعًا", "hinglish": "Allahumma sayyiban naafi’an", "translation": "O Allah, make it beneficial rain", "category": "weather" },
+  { "title": "Aandhi toofan ki dua", "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا", "hinglish": "Allahumma inni as’aluka khayraha", "translation": "O Allah, I ask You for its goodness", "category": "weather" },
+  { "title": "Chand dekhne ki dua", "arabic": "اللَّهُمَّ أَهِلَّهُ عَلَيْنَا بِالْيُمْنِ وَالإِيمَانِ", "hinglish": "Allahumma ahillahu ‘alayna bilyumni wal imaan", "translation": "O Allah, let this moon appear on us with safety and faith", "category": "weather" },
+  { "title": "Naya saal dekhne ki dua", "arabic": "اللَّهُمَّ اجْعَلْهُ عَامًا مُبَارَكًا", "hinglish": "Allahumma aj‘alhu ‘aaman mubaarakan", "translation": "O Allah, make it a blessed year", "category": "rozmarra" },
+  { "title": "Ilm hasil karne ki dua", "arabic": "رَّبِّ زِدْنِي عِلْمًا", "hinglish": "Rabbi zidni ilma", "translation": "My Lord, increase me in knowledge", "category": "ilm" },
+  { "title": "Karz se chutkaara ki dua", "arabic": "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ", "hinglish": "Allahumma ikfini bihalalika ‘an haramika", "translation": "O Allah, suffice me with what is halal instead of haram", "category": "rozmarra" },
+  { "title": "Rizq ke liye dua", "arabic": "اللَّهُمَّ اكْفِنِي بِحَلَالِكَ", "hinglish": "Allahumma ikfini bihalalika", "translation": "O Allah, provide me with halal sustenance", "category": "rizq" },
+  { "title": "Maghfirat ki dua", "arabic": "رَبِّ اغْفِرْ لِي", "hinglish": "Rabbi ighfir li", "translation": "My Lord, forgive me", "category": "maghfirat" },
+  { "title": "Jannat mangne ki dua", "arabic": "اللَّهُمَّ اجْعَلْنِي مِنْ أَهْلِ الْجَنَّةِ", "hinglish": "Allahumma aj‘alni min ahlil-jannah", "translation": "O Allah, make me among the people of Paradise", "category": "akhirat" }
+];
+
+    const searchBox = document.getElementById('searchBox');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const duaList = document.getElementById('duaList');
+
+    function renderDuas(list) {
+      duaList.innerHTML = "";
+      list.forEach(dua => {
+        const card = document.createElement('div');
+        card.classList.add('dua-card');
+        card.setAttribute('data-category', dua.category);
+
+        card.innerHTML = `
+          <div class="dua-header">
+            ${dua.title}
+            <span class="arrow">▶</span>
+          </div>
+          <div class="dua-content">
+            <div class="dua-arabic">${dua.arabic}</div>
+            <div class="dua-hinglish">📌 ${dua.hinglish}</div>
+            <div class="dua-translation">📄 ${dua.translation}</div>
+          </div>
+        `;
+
+        const header = card.querySelector('.dua-header');
+        const content = card.querySelector('.dua-content');
+        const arrow = card.querySelector('.arrow');
+
+        header.addEventListener('click', () => {
+          const isOpen = content.style.display === "block";
+          document.querySelectorAll('.dua-content').forEach(c => c.style.display = "none");
+          document.querySelectorAll('.arrow').forEach(a => a.classList.remove('open'));
+
+          if (!isOpen) {
+            content.style.display = "block";
+            arrow.classList.add('open');
+          }
+        });
+
+        duaList.appendChild(card);
+      });
+    }
+
+    function filterDuas() {
+      const searchText = searchBox.value.toLowerCase();
+      const category = categoryFilter.value;
+
+      const filtered = duas.filter(dua => {
+        const matchesSearch =
+          dua.title.toLowerCase().includes(searchText) ||
+          dua.hinglish.toLowerCase().includes(searchText) ||
+          dua.translation.toLowerCase().includes(searchText);
+
+        const matchesCategory = category === 'all' || dua.category === category;
+
+        return matchesSearch && matchesCategory;
+      });
+
+      renderDuas(filtered);
+    }
+
+    // Init
+    renderDuas(duas);
+    searchBox.addEventListener('input', filterDuas);
+    categoryFilter.addEventListener('change', filterDuas);
+  </script>
+</body>
+</html>
